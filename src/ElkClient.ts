@@ -130,9 +130,9 @@ class ElkClient extends ElkClientCommands {
         if (this._connection.state === ElkConnectionState.Disconnecting) {
           // If we're in the process of closing the connection, wait for it
           // to close then try to connect.
-          this._connection.disconnect().then(() => this._connection.connect());
+          void this._connection.disconnect().then(() => this._connection.connect());
         } else {
-          this._connection.connect();
+          void this._connection.connect();
         }
       })
     )
@@ -181,7 +181,7 @@ class ElkClient extends ElkClientCommands {
       // If we do need to authenticate, this should cause
       // the control panel to issue a failure message or request
       // authentication.
-      this.getVersionNumber();
+      void this.getVersionNumber();
     }
   };
 
@@ -226,13 +226,13 @@ class ElkClient extends ElkClientCommands {
               'Username was requested but none was provided.'
             )
           );
-          this.disconnect();
+          this.disconnect().catch(() => undefined);
           return;
         }
 
         this._state = ElkClientState.Authenticating;
         this.emit('authenticating');
-        this._connection.write(this.options.username + '\r\n');
+        void this._connection.write(this.options.username + '\r\n');
         break;
       }
       case PASSWORD_REQUEST: {
@@ -244,10 +244,10 @@ class ElkClient extends ElkClientCommands {
               'Password was requested but none was provided.'
             )
           );
-          this.disconnect();
+          this.disconnect().catch(() => undefined);
           return;
         }
-        this._connection.write(this.options.password + '\r\n');
+        void this._connection.write(this.options.password + '\r\n');
         break;
       }
       case LOGIN_FAILURE: {
@@ -258,7 +258,7 @@ class ElkClient extends ElkClientCommands {
             'Login failed, invalid username or password.'
           )
         );
-        this.disconnect();
+        this.disconnect().catch(() => undefined);
         return;
       }
       case LOGIN_SUCCESSFUL: {

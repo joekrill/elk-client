@@ -162,8 +162,10 @@ class ElkSocketConnection extends EventEmitter implements ElkConnection {
     // Emitted when an error occurs. The 'close' event will be called
     // directly following this event.
     if (this._socket) {
-      this._socket.destroy();
+      this._socket.destroy(error);
     }
+
+    this.emit('error', error);
   };
 
   /**
@@ -208,21 +210,21 @@ class ElkSocketConnection extends EventEmitter implements ElkConnection {
 
         socket = createSocket(this.options);
         socket.on('connect', connectListener);
-        socket.on('error', errorListener);
+        this.on('error', errorListener);
         this.on('disconnecting', disconnectingListener);
         this.setSocket(socket);
       })
     )
       .catch(error => {
         socket.removeListener('connect', connectListener);
-        socket.removeListener('error', errorListener);
+        this.removeListener('error', errorListener);
         this.removeListener('disconnecting', disconnectingListener);
         this.setSocket(undefined);
         throw error;
       })
       .then(() => {
         socket.removeListener('connect', connectListener);
-        socket.removeListener('error', errorListener);
+        this.removeListener('error', errorListener);
         this.removeListener('disconnecting', disconnectingListener);
         return this;
       });

@@ -235,9 +235,10 @@ describe('ElkClient', () => {
 
       describe('when username requested', () => {
         let authenticatingEmitted = false;
+        let connectPromise: Promise<ElkClient>;
 
         beforeEach(() => {
-          client.connect();
+          connectPromise = client.connect(5);
           client.once('authenticating', () => {
             authenticatingEmitted = true;
           });
@@ -245,45 +246,58 @@ describe('ElkClient', () => {
           client.connection.emit('data', '\r\nUsername: ');
         });
 
-        test('sends the username', () => {
+        afterEach(async () => {
+          // Let the promise reject.
+          return connectPromise.catch(() => undefined);
+        });
+
+        test('sends the username', async () => {
           expect(mockSocketConnectionInstance.write).toHaveBeenCalledWith('someone\r\n');
         });
 
-        test('sets state', () => {
+        test('sets state', async () => {
           expect(client.state).toBe(ElkClientState.Authenticating);
         });
 
-        test('emits "authenticating"', () => {
+        test('emits "authenticating"', async () => {
           expect(authenticatingEmitted).toBe(true);
         });
       });
 
       describe('when password requested', () => {
-        let authenticatingEmitted = false;
+        let connectPromise: Promise<ElkClient>;
 
         beforeEach(() => {
-          client.connect();
-          client.once('authenticating', () => {
-            authenticatingEmitted = true;
-          });
+          connectPromise = client.connect(5);
           mockSocketConnectionInstance.write.mockClear();
           client.connection.emit('data', '\r\nPassword: ');
         });
 
-        test('sends the password', () => {
+        afterEach(async () => {
+          // Let the promise reject.
+          return connectPromise.catch(() => undefined);
+        });
+
+        test('sends the password', async () => {
           expect(mockSocketConnectionInstance.write).toHaveBeenCalledWith('supersecret\r\n');
         });
       });
 
       describe('when successful', () => {
         let authenticatedEmitted = false;
+        let connectPromise: Promise<ElkClient>;
 
         beforeEach(() => {
-          client.connect();
+          connectPromise = client.connect();
           client.once('authenticated', () => {
             authenticatedEmitted = true;
           });
           client.connection.emit('data', '\r\nElk-M1XEP: Login successful.\r\n');
+        });
+
+        afterEach(async () => {
+          // Let the promise reject.
+          return connectPromise.catch(() => undefined);
         });
 
         test('sets state', () => {
@@ -328,13 +342,19 @@ describe('ElkClient', () => {
 
     describe('when OK received', () => {
       let okEmitted = false;
+      let connectPromise: Promise<ElkClient>;
 
       beforeEach(() => {
-        client.connect();
+        connectPromise = client.connect(5);
         client.once('ok', () => {
           okEmitted = true;
         });
         client.connection.emit('data', 'OK\r\n');
+      });
+
+      afterEach(async () => {
+        // Let the promise reject.
+        return connectPromise.catch(() => undefined);
       });
 
       test('emits "ok" event', () => {
@@ -409,6 +429,7 @@ describe('ElkClient', () => {
   describe('connection disconnects', () => {
     let client: ElkClient;
     let disconnectedEmitted = false;
+    let connectPromise: Promise<ElkClient>;
 
     beforeEach(() => {
       client = new ElkClient();
@@ -417,9 +438,14 @@ describe('ElkClient', () => {
       });
       ((client.connection as unknown) as ElkSocketConnectionMock).state =
         ElkConnectionState.Connected;
-      client.connect();
+      connectPromise = client.connect();
       client.connection.emit('data', '\r\nElk-M1XEP: Login successful.\r\n');
       client.connection.emit('disconnected');
+    });
+
+    afterEach(async () => {
+      // Let the promise reject.
+      return connectPromise.catch(() => undefined);
     });
 
     test('emits "disconnected"', () => {

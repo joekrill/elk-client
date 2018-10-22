@@ -219,20 +219,20 @@ describe('ElkSocketConnection', () => {
         connection = new ElkSocketConnection();
       });
 
-      test('initially sets state to Connecting', () => {
-        connection.connect();
+      test('initially sets state to Connecting', async () => {
+        expect.assertions(1);
+        let promise = connection.connect();
         expect(connection.state).toBe(ElkConnectionState.Connecting);
+        await promise;
       });
 
-      test('emits "connecting" then "connected"', done => {
+      test('emits "connecting" then "connected"', async () => {
         expect.assertions(2);
         const emitSpy = jest.spyOn(connection, 'emit');
         const promise = connection.connect();
         expect(emitSpy).toHaveBeenCalledWith('connecting');
-        promise.then(() => {
-          expect(emitSpy).toHaveBeenCalledWith('connected');
-          done();
-        });
+        await promise;
+        expect(emitSpy).toHaveBeenCalledWith('connected');
       });
 
       test('resolves and shows state as Connected', async () => {
@@ -377,7 +377,7 @@ describe('ElkSocketConnection', () => {
         const connectPromise = connection.connect();
         expect(emitSpy).toHaveBeenCalledWith('connecting');
         await connection.disconnect();
-        connectPromise.catch(err => {}); // Ignore rejected promise, it's expected.
+        connectPromise.catch(() => undefined); // Ignore rejected promise, it's expected.
         expect(emitSpy).toHaveBeenCalledWith('disconnected');
         expect(emitSpy).not.toHaveBeenCalledWith('connected');
       });
@@ -482,14 +482,20 @@ describe('ElkSocketConnection', () => {
     });
 
     describe('when connecting', () => {
+      let connectPromise: Promise<ElkSocketConnection>;
+
       beforeEach(() => {
         mockCreateSocketConnectsSuccessfully();
         connection = new ElkSocketConnection();
+        connectPromise = connection.connect(5);
+      });
+
+      afterEach(async () => {
+        connectPromise.catch(() => undefined);
       });
 
       it('cancels the connect and resolves', async () => {
         expect.assertions(2);
-        connection.connect();
         expect(connection.state).toBe(ElkConnectionState.Connecting);
         try {
           await connection.write('foo');
@@ -557,7 +563,7 @@ describe('ElkSocketConnection', () => {
       expect.assertions(2);
       const connectionEmitSpy = jest.spyOn(connection, 'emit');
       await connection.connect();
-      const buffer = new Buffer('somedata');
+      const buffer = Buffer.from('somedata', 'ascii');
       const bufferSpy = jest.spyOn(buffer, 'toString');
       socketMock.emit('data', buffer);
       expect(bufferSpy).toHaveBeenCalled();
@@ -567,18 +573,26 @@ describe('ElkSocketConnection', () => {
 
   describe('when an error is emitted', () => {
     let socketMock: SocketMock;
+    let testError: Error;
+
     beforeEach(() => {
       mockCreateSocketConnectsSuccessfully(0, mock => {
         socketMock = mock;
       });
       connection = new ElkSocketConnection();
+      testError = new Error('Something went wrong!');
     });
 
-    it('emits it as a string', async () => {
-      expect.assertions(1);
+    it('destroys the socket and emits the error', async () => {
+      expect.assertions(2);
+      let errorEmitted;
       await connection.connect();
-      socketMock.emit('error', new Error());
+      connection.on('error', error => {
+        errorEmitted = error;
+      });
+      socketMock.emit('error', testError);
       expect(socketMock.destroy).toHaveBeenCalled();
+      expect(errorEmitted).toBe(testError);
     });
   });
 
