@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import createSocket from './createSocket';
 import ElkSocketConnectionOptions, {
   DEFAULT_OPTIONS,
-  SECURE_DEFAULT_OPTIONS
+  SECURE_DEFAULT_OPTIONS,
 } from './ElkSocketConnectionOptions';
 import ElkConnection, { STATE_CHANGE_EVENT_NAMES } from './ElkConnection';
 import ElkConnectionState from './ElkConnectionState';
@@ -41,7 +41,7 @@ class ElkSocketConnection extends EventEmitter implements ElkConnection {
 
     this.options = {
       ...(initialOptions.secure ? SECURE_DEFAULT_OPTIONS : DEFAULT_OPTIONS),
-      ...initialOptions
+      ...initialOptions,
     };
   }
 

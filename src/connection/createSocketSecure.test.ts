@@ -27,7 +27,7 @@ describe('createSocketSecure', () => {
       createSocketSecure({
         host: '123',
         port: 234,
-        secureOptions: { rejectUnauthorized: true, secureProtocol: 'FOOBAR' }
+        secureOptions: { rejectUnauthorized: true, secureProtocol: 'FOOBAR' },
       });
     });
 

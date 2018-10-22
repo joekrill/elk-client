@@ -126,8 +126,8 @@ describe('ElkSocketConnection', () => {
           idleTimeout: 1,
           connectTimeout: 2,
           secureOptions: {
-            rejectUnauthorized: true
-          }
+            rejectUnauthorized: true,
+          },
         });
       });
 

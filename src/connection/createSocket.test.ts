@@ -12,7 +12,7 @@ describe('createSocket', () => {
     port: 2101,
     secure: false,
     idleTimeout: 1000,
-    connectTimeout: 2000
+    connectTimeout: 2000,
   };
 
   beforeEach(() => {

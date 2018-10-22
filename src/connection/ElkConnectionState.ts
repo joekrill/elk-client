@@ -22,7 +22,7 @@ enum ElkConnectionState {
    * (one side has issued a disconnection notice, but the other side may
    * node have responded yet.)
    */
-  Disconnecting = 3
+  Disconnecting = 3,
 }
 
 export default ElkConnectionState;

@@ -11,7 +11,7 @@ export default function createSecureSocket(options: {
     {
       rejectUnauthorized: false,
       secureProtocol: 'TLSv1_method',
-      ...options.secureOptions
+      ...options.secureOptions,
     }
   );
 }

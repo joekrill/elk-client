@@ -66,7 +66,7 @@ export const DEFAULT_OPTIONS: ElkSocketConnectionOptions = {
   port: DEFAULT_INSECURE_PORT,
   secure: false,
   idleTimeout: 60 * 1000,
-  connectTimeout: 30 * 1000
+  connectTimeout: 30 * 1000,
 };
 
 /**
@@ -75,5 +75,5 @@ export const DEFAULT_OPTIONS: ElkSocketConnectionOptions = {
 export const SECURE_DEFAULT_OPTIONS: ElkSocketConnectionOptions = {
   ...DEFAULT_OPTIONS,
   secure: true,
-  port: DEFAULT_SECURE_PORT
+  port: DEFAULT_SECURE_PORT,
 };

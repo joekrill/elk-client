@@ -2,7 +2,7 @@ export enum AuthenticationFailedReason {
   Unknown = 0,
   InvalidCredentials = 1,
   MissingUsername = 2,
-  MissingPassword = 3
+  MissingPassword = 3,
 }
 
 /**

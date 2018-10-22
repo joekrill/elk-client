@@ -13,7 +13,7 @@ export const STATE_CHANGE_EVENT_NAMES: { [P in ElkConnectionState]: string } = {
   [ElkConnectionState.Disconnected]: 'disconnected',
   [ElkConnectionState.Connecting]: 'connecting',
   [ElkConnectionState.Connected]: 'connected',
-  [ElkConnectionState.Disconnecting]: 'disconnecting'
+  [ElkConnectionState.Disconnecting]: 'disconnecting',
 };
 
 export default interface ElkConnection {
