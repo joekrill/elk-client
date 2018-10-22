@@ -277,7 +277,7 @@ class ElkClient extends ElkClientCommands {
           // for multiple packets at once.
           data.split(/\r\n|\r|\n/).forEach(packet => {
             if (packet) {
-              if (packet == 'OK') {
+              if (packet === 'OK') {
                 this.emit('ok');
               } else {
                 this.emit('message', parseElkResponse(packet + '\r\n'));

@@ -16,13 +16,7 @@ export default interface ElkClientEvents {
   /**
    * Emitted when authentication has begun
    */
-  addListener(event: 'authenticating', listener: Listener): this;
-
-  /**
-   *
-   * Emitted when successfully authenticated
-   */
-  addListener(event: 'authenticated', listener: Listener): this;
+  addListener(event: 'authenticating' | 'authenticated', listener: Listener): this;
 
   /**
    * Emitted whenever the underlying connection disconnects
@@ -43,44 +37,38 @@ export default interface ElkClientEvents {
   addListener(event: 'ok', listener: DataListener): this;
 
   removeListener(event: 'message', listener: MessageListener): this;
-  removeListener(event: 'authenticating', listener: Listener): this;
-  removeListener(event: 'authenticated', listener: Listener): this;
+  removeListener(event: 'authenticating' | 'authenticated', listener: Listener): this;
   removeListener(event: 'disconnected', listener: DisconnectedListener): this;
   removeListener(event: 'error', listener: ErrorListener): this;
   removeListener(event: 'ok', listener: DataListener): this;
 
   on(event: 'message', listener: MessageListener): this;
-  on(event: 'authenticating', listener: Listener): this;
-  on(event: 'authenticated', listener: Listener): this;
+  on(event: 'authenticating' | 'authenticated', listener: Listener): this;
   on(event: 'disconnected', listener: DisconnectedListener): this;
   on(event: 'error', listener: ErrorListener): this;
   on(event: 'ok', listener: DataListener): this;
 
   once(event: 'message', listener: MessageListener): this;
-  once(event: 'authenticating', listener: Listener): this;
-  once(event: 'authenticated', listener: Listener): this;
+  once(event: 'authenticating' | 'authenticated', listener: Listener): this;
   once(event: 'disconnected', listener: DisconnectedListener): this;
   once(event: 'error', listener: ErrorListener): this;
   once(event: 'ok', listener: DataListener): this;
 
   prependListener(event: 'message', listener: MessageListener): this;
-  prependListener(event: 'authenticating', listener: Listener): this;
-  prependListener(event: 'authenticated', listener: Listener): this;
+  prependListener(event: 'authenticating' | 'authenticated', listener: Listener): this;
   prependListener(event: 'disconnected', listener: DisconnectedListener): this;
   prependListener(event: 'error', listener: ErrorListener): this;
   prependListener(event: 'ok', listener: DataListener): this;
 
   prependOnceListener(event: 'message', listener: MessageListener): this;
-  prependOnceListener(event: 'authenticating', listener: Listener): this;
-  prependOnceListener(event: 'authenticated', listener: Listener): this;
+  prependOnceListener(event: 'authenticating' | 'authenticated', listener: Listener): this;
   prependOnceListener(event: 'disconnected', listener: DisconnectedListener): this;
   prependOnceListener(event: 'error', listener: ErrorListener): this;
   prependOnceListener(event: 'ok', listener: DataListener): this;
 
   emit(event: string | symbol, ...args: any[]): boolean;
   emit(event: 'message', message: ElkMessage): void;
-  emit(event: 'authenticating'): void;
-  emit(event: 'authenticated'): void;
+  emit(event: 'authenticating' | 'authenticated'): void;
   emit(event: 'disconnected', error?: Error): void;
   emit(event: 'error', error: Error): void;
   emit(event: 'ok', raw: string): void;
