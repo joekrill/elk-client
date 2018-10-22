@@ -23,7 +23,14 @@ import { ElkClient } from 'elk-client';
 
 // Parse a message
 
-const client = new ElkClient('elkm1s://someuser:supersecretpassword@192.168.0.251?timeout=30');
+const client = new ElkClient({
+  connection: { 
+    host: 'elkm1.example.net',
+    secure: true,
+  },
+  username: 'myelkm1username',
+  password: 'supersecret!',
+});
 
 client
   .connect()
