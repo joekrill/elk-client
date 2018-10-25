@@ -216,6 +216,7 @@ class ElkSocketConnection extends EventEmitter implements ElkConnection {
       })
     )
       .catch(error => {
+        socket.destroy();
         socket.removeListener('connect', connectListener);
         this.removeListener('error', errorListener);
         this.removeListener('disconnecting', disconnectingListener);
@@ -240,11 +241,12 @@ class ElkSocketConnection extends EventEmitter implements ElkConnection {
 
     return withTimeout<ElkSocketConnection>(
       timeout,
-      new Promise((resolve, reject) => {
+      new Promise(resolve => {
         if (!this._socket) {
           // Already disconnected, just resolve.
           return resolve(this);
         }
+
         socket = this._socket;
 
         if (this.state === ElkConnectionState.Connecting) {

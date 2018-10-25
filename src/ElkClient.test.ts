@@ -157,25 +157,23 @@ describe('ElkClient', () => {
 
       describe('no credentials needed', () => {
         test('becomes ready', async () => {
-          expect.assertions(2);
-          setTimeout(() => {
-            // No requests is ever made for username/password, but the panel
-            // emits the ethernet test response.
-            client.connection.emit('data', '16XK2636115020605110006F\r\n');
+          let connectedEmitted = false;
+          let readyEmitted = false;
+          expect.assertions(4);
+          client.once('connected', () => {
+            connectedEmitted = true;
           });
-          await client.connect();
-          expect(client.state).toBe(ElkClientState.Ready);
-          expect(client.authenticated).toBe(false);
-        });
-
-        test('requests the version number when connected', async () => {
-          expect.assertions(1);
+          client.once('ready', () => {
+            readyEmitted = true;
+          });
           setTimeout(() => {
             client.connection.emit('connected');
-            client.connection.emit('data', 'OK\r\n');
           });
           await client.connect();
-          expect(client.connection.write).toHaveBeenCalledWith('06vn0056\r\n');
+          expect(connectedEmitted).toBe(true);
+          expect(readyEmitted).toBe(true);
+          expect(client.state).toBe(ElkClientState.Ready);
+          expect(client.authenticated).toBe(false);
         });
       });
 
@@ -328,6 +326,59 @@ describe('ElkClient', () => {
               AuthenticationFailedReason.InvalidCredentials
             );
           }
+        });
+      });
+
+      describe('when not needed', () => {
+        let readyEmitted = false;
+
+        beforeEach(() => {
+          client.once('ready', () => {
+            readyEmitted = true;
+          });
+        });
+
+        test('emits "ready" when data is received', async () => {
+          setTimeout(() => {
+            client.connection.emit('data', '16XK2516135251018110006C\r\n');
+          });
+          await client.connect();
+          expect(readyEmitted).toBe(true);
+          expect(client.isReady).toBe(true);
+        });
+      });
+
+      describe('while authenticating', () => {
+        let connectPromise: Promise<ElkClient>;
+        let messageEmitCount: number = 0;
+        let okEmitCount: number = 0;
+
+        beforeEach(() => {
+          connectPromise = client.connect(5);
+          mockSocketConnectionInstance.write.mockClear();
+          client.connection.emit('data', '\r\nUsername: ');
+          client.on('message', () => {
+            messageEmitCount++;
+          });
+          client.on('message', () => {
+            okEmitCount++;
+          });
+        });
+
+        afterEach(async () => {
+          // Let the promise reject.
+          client.removeAllListeners();
+          return connectPromise.catch(() => undefined);
+        });
+
+        test('ignores non-auth related messages ', async () => {
+          client.connection.emit('data', '\r\nUsername: ');
+          expect(client.state).toBe(ElkClientState.Authenticating);
+          client.connection.emit('data', 'OK\r\n');
+          client.connection.emit('data', '16XK2636115020605110006F\r\n');
+          client.connection.emit('data', 'OK\r\n');
+          expect(messageEmitCount).toBe(0);
+          expect(okEmitCount).toBe(0);
         });
       });
     });
