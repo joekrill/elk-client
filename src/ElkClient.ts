@@ -4,7 +4,7 @@ import ElkConnectionState from './connection/ElkConnectionState';
 import ElkClientCommands from './ElkClientCommands';
 import ElkClientState from './ElkClientState';
 import AuthenticationFailedError, {
-  AuthenticationFailedReason
+  AuthenticationFailedReason,
 } from './errors/AuthenticationFailedError';
 import ElkSocketConnection from './connection/ElkSocketConnection';
 import ElkClientOptions from './ElkClientOptions';
@@ -153,7 +153,7 @@ class ElkClient extends ElkClientCommands {
    * when completed.
    */
   async disconnect(): Promise<void> {
-    return this._connection.disconnect().then(() => undefined);
+    await this._connection.disconnect();
   }
 
   /**
@@ -172,16 +172,23 @@ class ElkClient extends ElkClientCommands {
     this.emit('ready');
   }
 
-  private onConnectionConnected = () => {
+  private onConnectionConnected = async () => {
+    this.emit('connected');
+
+    // At this point we may need to authenticate.
+    // The panel will send "\r\nUsername: " to request
+    // the username. and that will cause the authentication
+    // process to be triggered and that will eventually
+    // lead to a "ready" or "error" being emitted, depending
+    // on whether the authentication was successful.
+    // But in the case that we DON'T need to authenticate,
+    // we just immediately trigger the ready state. Otherwise
+    // we'd have to wait for the panel to emit some data
+    // to trigger that, and that could be up to 30 seconds
+    // depending on the timing (an "XK" message is emitted
+    // every 30 seconds).
     if (!this.options.username) {
-      // If no user name was supplied then send a command
-      // to test the state of our connection. If we don't
-      // need authentication, the onConnectionData callback
-      // will see the response and mark the state as ready.
-      // If we do need to authenticate, this should cause
-      // the control panel to issue a failure message or request
-      // authentication.
-      void this.getVersionNumber();
+      this.onReady(false);
     }
   };
 
@@ -200,7 +207,7 @@ class ElkClient extends ElkClientCommands {
     this.emit('error', error);
   };
 
-  private onConnectionData = (data: string) => {
+  private onConnectionData = async (data: string) => {
     // TODO: Does each `data` chunk always contain complete
     // messages? Do we need to consider that we might get
     // a partial message? I've seen _multiple_ complete
@@ -226,7 +233,7 @@ class ElkClient extends ElkClientCommands {
               'Username was requested but none was provided.'
             )
           );
-          this.disconnect().catch(() => undefined);
+          await this.disconnect();
           return;
         }
 
@@ -244,7 +251,7 @@ class ElkClient extends ElkClientCommands {
               'Password was requested but none was provided.'
             )
           );
-          this.disconnect().catch(() => undefined);
+          await this.disconnect();
           return;
         }
         void this._connection.write(this.options.password + '\r\n');
@@ -258,7 +265,7 @@ class ElkClient extends ElkClientCommands {
             'Login failed, invalid username or password.'
           )
         );
-        this.disconnect().catch(() => undefined);
+        await this.disconnect();
         return;
       }
       case LOGIN_SUCCESSFUL: {
@@ -270,20 +277,25 @@ class ElkClient extends ElkClientCommands {
         // because the username and password will be echoed back
         if (this._state !== ElkClientState.Authenticating) {
           if (!this.isReady && this.isConnected) {
+            // If we're getting data and connected, but not "ready",
+            // we need to switch to a ready state. This could happen if
+            // a username was provided but not requested by the control
+            // panel.
             this.onReady();
           }
 
           // The M1 doesn't always send a single packet, so we need to check
           // for multiple packets at once.
-          data.split(/\r\n|\r|\n/).forEach(packet => {
-            if (packet) {
+          data
+            .split(/\r\n|\r|\n/)
+            .filter(packet => !!packet)
+            .forEach(packet => {
               if (packet === 'OK') {
                 this.emit('ok');
               } else {
                 this.emit('message', parseElkResponse(packet + '\r\n'));
               }
-            }
-          });
+            });
         }
       }
     }

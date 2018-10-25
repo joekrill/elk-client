@@ -310,13 +310,7 @@ describe('ElkSocketConnection', () => {
 
     describe('times out', () => {
       beforeEach(() => {
-        mockCreateSocketConnectsSuccessfully();
-        mocked(createSocket).mockImplementation(() => {
-          const mock = new SocketMock();
-          mock.setConnecting();
-          setTimeout(() => mock.setConnected(), 10);
-          return mock;
-        });
+        mockCreateSocketConnectsSuccessfully(10);
         connection = new ElkSocketConnection();
       });
 
@@ -491,7 +485,7 @@ describe('ElkSocketConnection', () => {
       });
 
       afterEach(async () => {
-        connectPromise.catch(() => undefined);
+        return connectPromise.catch(() => undefined);
       });
 
       it('cancels the connect and resolves', async () => {
