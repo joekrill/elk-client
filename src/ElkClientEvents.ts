@@ -66,7 +66,7 @@ declare function error(error: Error): void;
  * @asMemberOf ElkClientEvents
  * @event
  */
-declare function disconnected(error?: Error): void;
+declare function disconnected(error?: Error): void; // tslint:disable-line:handle-callback-err
 
 export default interface ElkClientEvents {
   addListener(event: 'connected', listener: typeof connected): this;

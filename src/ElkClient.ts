@@ -127,12 +127,19 @@ class ElkClient extends ElkClientCommands {
         errorListener = error => reject(error);
         this.on('ready', readyListener);
         this.on('error', errorListener);
+
+        // We can safely ignore rejected promises from these
+        // connect calls because they will also trigger
+        // error callbacks, which we will be listening for.
         if (this._connection.state === ElkConnectionState.Disconnecting) {
           // If we're in the process of closing the connection, wait for it
           // to close then try to connect.
-          void this._connection.disconnect().then(() => this._connection.connect());
+          this._connection
+            .disconnect()
+            .then(() => this._connection.connect())
+            .catch(() => undefined);
         } else {
-          void this._connection.connect();
+          this._connection.connect().catch(() => undefined);
         }
       })
     )
@@ -239,7 +246,7 @@ class ElkClient extends ElkClientCommands {
 
         this._state = ElkClientState.Authenticating;
         this.emit('authenticating');
-        void this._connection.write(this.options.username + '\r\n');
+        this._connection.write(this.options.username + '\r\n').catch(() => undefined);
         break;
       }
       case PASSWORD_REQUEST: {
@@ -254,7 +261,7 @@ class ElkClient extends ElkClientCommands {
           await this.disconnect();
           return;
         }
-        void this._connection.write(this.options.password + '\r\n');
+        this._connection.write(this.options.password + '\r\n').catch(() => undefined);
         break;
       }
       case LOGIN_FAILURE: {
