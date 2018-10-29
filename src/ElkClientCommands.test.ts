@@ -73,7 +73,7 @@ import {
   CustomValueFormat,
   AudioDataReply,
   ArmingStatusRequest,
-  ArmingStatusReport
+  ArmingStatusReport,
 } from 'elk-message';
 import TimeoutError from './errors/TimeoutError';
 import { cd } from 'shelljs';
@@ -108,20 +108,20 @@ const sendCommandForResponseTypeTests: [
     'setRealTimeClock',
     RealTimeClockDataWrite,
     RealTimeClockDataReply,
-    [2017, 5, 15, DayOfWeek.Monday, 11, 32, 44]
+    [2017, 5, 15, DayOfWeek.Monday, 11, 32, 44],
   ],
   [
     'getDescription',
     TextDescriptionRequest,
     TextDescriptionReply,
-    [TextDescriptionType.AreaName, 3]
+    [TextDescriptionType.AreaName, 3],
   ],
   ['getTroubleStatus', SystemTroubleStatusRequest, SystemTroubleStatusReply],
   ['getOmnistat2Data', Omnistat2Request, Omnistat2Reply, ['fooo']],
   ['getVersionNumber', VersionNumberRequest, VersionNumberReply],
   ['getZonePartitions', ZonePartitionRequest, ZonePartitionReport],
   ['getZoneStatus', ZoneStatusRequest, ZoneStatusReport],
-  ['getZoneDefinitions', ZoneDefinitionRequest, ZoneDefinitionData]
+  ['getZoneDefinitions', ZoneDefinitionRequest, ZoneDefinitionData],
 ];
 
 /**
@@ -137,13 +137,13 @@ const sendCommandOnlyTest: [
     'arm',
     cmd => cmd.arm(2, ArmingLevel.ArmedStay, '1234'),
     Arm,
-    { areaNumber: 2, armingLevel: ArmingLevel.ArmedStay, userCode: '1234' }
+    { areaNumber: 2, armingLevel: ArmingLevel.ArmedStay, userCode: '1234' },
   ],
   [
     'disarm',
     cmd => cmd.disarm(4, '567891'),
     Arm,
-    { areaNumber: 4, armingLevel: ArmingLevel.Disarm, userCode: '567891' }
+    { areaNumber: 4, armingLevel: ArmingLevel.Disarm, userCode: '567891' },
   ],
   ['setControlOutputOff', cmd => cmd.setControlOutputOff(13), ControlOutputOff, { output: 13 }],
   ['setControlOutputOn', cmd => cmd.setControlOutputOn(79), ControlOutputOn, { output: 79 }],
@@ -160,8 +160,8 @@ const sendCommandOnlyTest: [
       firstLine: 'Hello',
       secondLine: 'There',
       subMessageType: 'm',
-      timeout: 0
-    }
+      timeout: 0,
+    },
   ],
   [
     'clearTextOnScreen',
@@ -169,8 +169,8 @@ const sendCommandOnlyTest: [
     DisplayTextOnScreen,
     {
       areaNumber: 5,
-      beep: false
-    }
+      beep: false,
+    },
   ],
   [
     'setPlcDevice',
@@ -181,31 +181,31 @@ const sendCommandOnlyTest: [
       unitCode: 3,
       functionCode: PlcFunctionCode.Bright,
       extendedCode: 67,
-      onTime: 1000
-    }
+      onTime: 1000,
+    },
   ],
   [
     'setPlcDeviceOff',
     cmd => cmd.setPlcDeviceOff('Cherry', 41),
     PlcDeviceOff,
-    { houseCode: 'Cherry', unitCode: 41 }
+    { houseCode: 'Cherry', unitCode: 41 },
   ],
   [
     'setPlcDeviceOn',
     cmd => cmd.setPlcDeviceOn('Banana', 10),
     PlcDeviceOn,
-    { houseCode: 'Banana', unitCode: 10 }
+    { houseCode: 'Banana', unitCode: 10 },
   ],
   [
     'togglePlcDevice',
     cmd => cmd.togglePlcDevice('Apple', 4),
     PlcDeviceToggle,
-    { houseCode: 'Apple', unitCode: 4 }
+    { houseCode: 'Apple', unitCode: 4 },
   ],
   ['speakWord', cmd => cmd.speakWord(42), SpeakWord, { wordNumber: 42 }],
   ['speakPhrase', cmd => cmd.speakPhrase(100), SpeakPhrase, { phraseNumber: 100 }],
   ['activateTask', cmd => cmd.activateTask(4), TaskActivation, { taskNumber: 4 }],
-  ['triggerZone', cmd => cmd.triggerZone(32), ZoneTrigger, { zoneNumber: 32 }]
+  ['triggerZone', cmd => cmd.triggerZone(32), ZoneTrigger, { zoneNumber: 32 }],
 ];
 
 describe('ElkClientCommands', () => {
@@ -367,8 +367,8 @@ describe('ElkClientCommands', () => {
         valueNumber: 3,
         value: {
           format: CustomValueFormat.Number,
-          value: 9
-        }
+          value: 9,
+        },
       }),
       expect.anything()
     );
@@ -386,7 +386,7 @@ describe('ElkClientCommands', () => {
     });
     expect(await classMock.changeUserCode(5, '123456', '2345')).toBe(matchingResponse);
     expect(sendCommandMock).toBeCalledWith(
-      expect.objectContaining({ userCode: 5 }),
+      expect.objectContaining({ userNumber: 5 }),
       expect.anything()
     );
   });
@@ -422,7 +422,7 @@ describe('ElkClientCommands', () => {
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
         counterNumber: 4,
-        value: 7
+        value: 7,
       }),
       expect.anything()
     );
@@ -441,7 +441,7 @@ describe('ElkClientCommands', () => {
     expect(await classMock.getLightingDeviceStatus(3)).toBe(matchingResponse);
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
-        lightingDeviceNumber: 3
+        lightingDeviceNumber: 3,
       }),
       expect.anything()
     );
@@ -465,7 +465,7 @@ describe('ElkClientCommands', () => {
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
         startingDeviceNumber: 1,
-        deviceCount: 4
+        deviceCount: 4,
       }),
       expect.anything()
     );
@@ -484,7 +484,7 @@ describe('ElkClientCommands', () => {
     );
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
-        startingDeviceNumber: 1
+        startingDeviceNumber: 1,
       }),
       expect.anything()
     );
@@ -503,7 +503,7 @@ describe('ElkClientCommands', () => {
     expect(await classMock.getKeypadFunctionKeyStatus(3)).toBe(matchingResponse);
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
-        keypadNumber: 3
+        keypadNumber: 3,
       }),
       expect.anything()
     );
@@ -524,7 +524,7 @@ describe('ElkClientCommands', () => {
       expect(sendCommandMock).toBeCalledWith(
         expect.objectContaining({
           keypadNumber: 2,
-          functionKey: FunctionKey.F1
+          functionKey: FunctionKey.F1,
         }),
         expect.anything()
       );
@@ -544,7 +544,7 @@ describe('ElkClientCommands', () => {
       expect(sendCommandMock).toBeCalledWith(
         expect.objectContaining({
           keypadNumber: 3,
-          functionKey: FunctionKey.None
+          functionKey: FunctionKey.None,
         }),
         expect.anything()
       );
@@ -564,7 +564,7 @@ describe('ElkClientCommands', () => {
     expect(await classMock.getSystemLogData(500)).toBe(matchingResponse);
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
-        logIndex: 500
+        logIndex: 500,
       }),
       expect.anything()
     );
@@ -583,7 +583,7 @@ describe('ElkClientCommands', () => {
         logType: LogWriteType.Alarm,
         eventType: 34,
         zoneNumber: 22,
-        areaNumber: 4
+        areaNumber: 4,
       }),
       expect.anything()
     );
@@ -621,7 +621,7 @@ describe('ElkClientCommands', () => {
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
         deviceType: TemperatureDeviceType.Keypad,
-        deviceNumber: 2
+        deviceNumber: 2,
       }),
       expect.anything()
     );
@@ -640,7 +640,7 @@ describe('ElkClientCommands', () => {
     expect(await classMock.getThermostatData(4)).toBe(matchingResponse);
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
-        thermostatNumber: 4
+        thermostatNumber: 4,
       }),
       expect.anything()
     );
@@ -663,7 +663,7 @@ describe('ElkClientCommands', () => {
       expect.objectContaining({
         thermostatNumber: 2,
         element: ThermostatSetType.CoolSetPoint,
-        value: 65
+        value: 65,
       }),
       expect.anything()
     );
@@ -684,7 +684,7 @@ describe('ElkClientCommands', () => {
       expect.objectContaining({
         thermostatNumber: 2,
         element: ThermostatSetType.CoolSetPoint,
-        value: 72
+        value: 72,
       }),
       expect.anything()
     );
@@ -705,7 +705,7 @@ describe('ElkClientCommands', () => {
       expect.objectContaining({
         thermostatNumber: 2,
         element: ThermostatSetType.HeatSetPoint,
-        value: 75
+        value: 75,
       }),
       expect.anything()
     );
@@ -726,7 +726,7 @@ describe('ElkClientCommands', () => {
       expect.objectContaining({
         thermostatNumber: 2,
         element: ThermostatSetType.Fan,
-        value: 0
+        value: 0,
       }),
       expect.anything()
     );
@@ -748,7 +748,7 @@ describe('ElkClientCommands', () => {
     expect(sendCommandMock).toBeCalledWith(
       expect.objectContaining({
         thermostatNumber: 2,
-        element: ThermostatSetType.Mode
+        element: ThermostatSetType.Mode,
       }),
       expect.anything()
     );
@@ -769,7 +769,7 @@ describe('ElkClientCommands', () => {
       expect.objectContaining({
         thermostatNumber: 2,
         element: ThermostatSetType.Hold,
-        value: 1
+        value: 1,
       }),
       expect.anything()
     );
