@@ -7,6 +7,7 @@ import WriteError from '../errors/WriteError';
 import NotConnectableError from '../errors/NotConnectableError';
 import TimeoutError from '../errors/TimeoutError';
 import ElkSocketConnection from './ElkSocketConnection';
+import { Socket } from 'net';
 
 jest.mock('net');
 jest.mock('tls');
@@ -69,7 +70,7 @@ function mockCreateSocketConnectsSuccessfully(waitMs = 5, modifier?: (mock: Sock
     }
     mock.setConnecting();
     setTimeout(() => mock.setConnected(), waitMs);
-    return mock;
+    return (mock as any) as Socket;
   });
 }
 
@@ -281,7 +282,7 @@ describe('ElkSocketConnection', () => {
           const mock = new SocketMock();
           mock.setConnecting();
           setTimeout(() => mock.setError(new Error('Nope!')), 10);
-          return mock;
+          return (mock as any) as Socket;
         });
         connection = new ElkSocketConnection();
       });
@@ -507,7 +508,7 @@ describe('ElkSocketConnection', () => {
           mock = new SocketMock();
           mock.setConnecting();
           setTimeout(() => mock.setConnected());
-          return mock;
+          return (mock as any) as Socket;
         });
         connection = new ElkSocketConnection();
       });
