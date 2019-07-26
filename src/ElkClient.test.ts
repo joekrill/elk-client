@@ -81,6 +81,7 @@ describe('ElkClient', () => {
         client.connection.connect = jest.fn(() => {
           // Force `client.connect()` to resolve.
           client.connection.emit('data', '\r\nElk-M1XEP: Login successful.\r\n');
+          return Promise.resolve(client.connection);
         });
       });
 

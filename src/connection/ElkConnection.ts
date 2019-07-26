@@ -90,5 +90,5 @@ export default interface ElkConnection {
   readonly state: ElkConnectionState;
   connect(): Promise<ElkConnection>;
   disconnect(): Promise<ElkConnection>;
-  write(data: string): Promise<{}>;
+  write(data: string): Promise<unknown>;
 }

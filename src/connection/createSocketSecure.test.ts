@@ -5,7 +5,7 @@ jest.mock('tls');
 
 describe('createSocketSecure', () => {
   beforeEach(() => {
-    (connect as jest.Mock<Function>).mockRestore();
+    ((connect as any) as jest.Mock<Function>).mockRestore();
   });
 
   describe('calls tls.connect', () => {
