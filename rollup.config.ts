@@ -15,11 +15,14 @@ export default {
     { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
     { file: pkg.module, format: 'es', sourcemap: true },
   ],
+
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: ['net', 'tls', 'events'],
+  external: ['dgram', 'net', 'tls', 'events'],
+
   watch: {
     include: 'src/**',
   },
+
   plugins: [
     // Allow json resolution
     json(),
@@ -27,6 +30,7 @@ export default {
     typescript({ useTsconfigDeclarationDir: true }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
+
     // Allow node_modules resolution, so you can use 'external' to control
     // which external modules to include in the bundle
     // https://github.com/rollup/rollup-plugin-node-resolve#usage

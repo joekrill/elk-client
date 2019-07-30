@@ -47,3 +47,52 @@ client
     console.error(err);
   });
 ```
+
+## Device discovery
+
+Devices can be discovered using UDP broadcast messages. Only M1XEP and C1M1 devices can be discovered. This is not documented by Elk Products, but this is how the ElkRP2 software does it's discovery.
+
+```
+import { ElkDiscoveryClient } from 'elk-client';
+
+const discoveryClient = new ElkDiscoveryClient();
+discoveryClient
+  .start()
+  .then((devices) => {
+    console.log(`Found `${devices.length}` devices!);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+You can optionally limit the device types requested and adjust the timeout, broadcast address, and port used:
+
+```
+import { ElkDiscoveryClient, ElkDeviceType } from 'elk-client';
+
+const discoveryClient = new ElkDiscoveryClient({
+  // Only look for M1XEP devices
+  deviceTypes: [ElkDeviceType.M1XEP],
+
+  // Use port 9000 instead
+  // NOTE: This probably won't ever work if you change the port!
+  port: 9000,
+
+  // Wait 10 seconds instead of the 5 second default
+  timeout: 10000,
+
+  // Use a different broadcast address (default is 255.255.255.255)
+  broadcastAddress: "192.168.1.255",
+});
+
+discoveryClient
+  .start()
+  .then((devices) => {
+    console.log(`Found `${devices.length}` devices!);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+

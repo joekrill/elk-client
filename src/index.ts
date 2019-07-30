@@ -4,5 +4,6 @@
 export { default as ElkClient } from './ElkClient';
 export { default as ElkClientOptions } from './ElkClientOptions';
 export { default as ElkClientState } from './ElkClientState';
+export * from './discovery';
 export * from './errors';
 export * from './connection';
