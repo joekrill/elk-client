@@ -76,7 +76,6 @@ import {
   ArmingStatusReport,
 } from 'elk-message';
 import TimeoutError from './errors/TimeoutError';
-import { cd } from 'shelljs';
 
 class ElkClientCommandsImpl extends ElkClientCommands {
   constructor(

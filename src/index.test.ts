@@ -2,11 +2,13 @@ import {
   ElkClient,
   ElkClientState,
   ElkConnectionState,
+  ElkDeviceType,
+  ElkDiscoveryClient,
   ElkSocketConnection,
   AuthenticationFailedError,
   ConnectCancelledError,
   NotConnectableError,
-  WriteError
+  WriteError,
 } from './';
 
 describe('exports', () => {
@@ -14,6 +16,8 @@ describe('exports', () => {
     expect(typeof ElkClient).toBe('function');
     expect(typeof ElkClientState).toBe('object');
     expect(typeof ElkConnectionState).toBe('object');
+    expect(typeof ElkDeviceType).toBe('object');
+    expect(typeof ElkDiscoveryClient).toBe('function');
     expect(typeof ElkSocketConnection).toBe('function');
     expect(typeof AuthenticationFailedError).toBe('function');
     expect(typeof ConnectCancelledError).toBe('function');
