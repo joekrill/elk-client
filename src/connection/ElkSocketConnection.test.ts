@@ -355,14 +355,10 @@ describe('ElkSocketConnection', () => {
       });
 
       it('cancels the connect and resolves', async () => {
-        let connectError;
-        expect.assertions(3);
-        connection.connect().catch(error => {
-          connectError = error;
-        });
+        expect.assertions(2);
+        connection.connect().catch(() => undefined);
         expect(connection.state).toBe(ElkConnectionState.Connecting);
         await connection.disconnect();
-        expect(connectError).toBeInstanceOf(ConnectCancelledError);
         expect(connection.state).toBe(ElkConnectionState.Disconnected);
       });
 
