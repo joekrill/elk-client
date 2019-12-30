@@ -129,6 +129,6 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "elk-message": "^1.0.5"
+    "elk-message": "^1.1.0"
   }
 }
